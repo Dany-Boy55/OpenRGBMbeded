@@ -25,12 +25,13 @@ byte effect;
 */
 
 void receiveData(){
+    // First byte is the length of upcoming packet
     byte dataLen = Serial.read();
     byte data[dataLen];
     Serial.readBytes(data, dataLen);
     // Second byte is a CRC checksum, not implemented yet
 
-    // Third byte in sequence is the command being parsed
+    // Third byte is the command being parsed
     switch (data[1])
     {
         case 0x00:  // 0 Identify this device (id, type, name)
@@ -39,7 +40,7 @@ void receiveData(){
         case 0x01: // Receive an effect
             effect = data[2];
             break;
-        case 0x03: // Receive a color --> (color[] red green blue)
+        case 0x03: // Receive a color --> (colorNumber, red, green, blue)
             Colors[data[2]].red = data[3];
             Colors[data[2]].green = data[4];
             Colors[data[2]].blue = data[5];
@@ -78,20 +79,23 @@ void fillSolid(CRGB color){
 void setup(void) {
     Serial.begin(19200);
     FastLED.addLeds<WS2812, 2, GRB>(ledBuffer, LEDNUM);
-    fillSolid(CRGB::Red);
-    delay(200);
-    fillSolid(CRGB::Green);
-    delay(200);
-    fillSolid(CRGB::Blue);
-    delay(200);
-    for(int i = 0; i < 5; i++)
+    
+    for(int i = 0; i < sizeof(ledBuffer); i++)
     {
-        delay(50);
-        if(i%2 == 0)
-            fillSolid(CRGB::Black);
-        else
-            fillSolid(CRGB::White);
+        ledBuffer[i] = CRGB::Red;
+        FastLED.show();
     }
+    for(int i = 0; i < sizeof(ledBuffer); i++)
+    {
+        ledBuffer[i] = CRGB::Green;
+        FastLED.show();
+    }
+    for(int i = 0; i < sizeof(ledBuffer); i++)
+    {
+        ledBuffer[i] = CRGB::Green;
+        FastLED.show();
+    }
+    
 }
 
 void loop(void) {
